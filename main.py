@@ -5,7 +5,7 @@ DISPLAY_SIZE = W, H = (640, 360)
 BLUE = (67, 156, 239)
 FPS = 60
 
-target_img = pygame.image.load('data/target.png')
+target_img = pygame.transform.scale_by(pygame.image.load('data/target.png'), 3)
 
 class Target(pygame.sprite.Sprite):
     def __init__(self, pos, groups):
@@ -14,6 +14,14 @@ class Target(pygame.sprite.Sprite):
         self.pos = pos
         self.image = target_img.convert_alpha()
         self.rect = self.image.get_rect(center = self.pos)
+    
+    def click(self):
+        if pygame.mouse.get_pressed()[0]:
+            if self.rect.collidepoint(pygame.mouse.get_pos()):
+                self.kill()
+    
+    def update(self):
+        self.click()
 
 class Game:
     def __init__(self):
@@ -21,7 +29,6 @@ class Game:
         pygame.display.set_caption("Clicker")
 
         self.window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
-        self.display = pygame.Surface(DISPLAY_SIZE)
         self.clock = pygame.time.Clock()
 
         self.targets = pygame.sprite.Group()
@@ -37,10 +44,10 @@ class Game:
         sys.exit()
     
     def update(self):
-        pass
+        self.targets.update()
 
     def render(self):
-        self.targets.draw(self.display)
+        self.targets.draw(self.window)
     
     def run(self):
         while True:
@@ -51,9 +58,8 @@ class Game:
             
             self.update()
 
-            self.display.fill(BLUE)
+            self.window.fill(BLUE)
             self.render()
-            self.window.blit(pygame.transform.scale(self.display, WINDOW_SIZE), (0, 0))
             
             pygame.display.update()
 
