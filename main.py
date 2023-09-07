@@ -5,6 +5,7 @@ BLUE = (67, 156, 239)
 BROWN = (101,83,83)
 FPS = 60
 SPAWNTARGET = pygame.USEREVENT + 1
+TARGET_LIFETIME = 5000
 
 target_img = pygame.transform.scale_by(pygame.image.load('data/target.png'), 3)
 
@@ -19,7 +20,7 @@ class Target(pygame.sprite.Sprite):
         self.init_time = pygame.time.get_ticks()
     
     def timer(self):
-        if pygame.time.get_ticks() - self.init_time > 1000:
+        if pygame.time.get_ticks() - self.init_time > TARGET_LIFETIME:
             self.kill()
     
     def click(self):
@@ -39,7 +40,9 @@ class Game:
         self.window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
         self.clock = pygame.time.Clock()
 
-        self.spawn_rate = 2000
+        self.start_time = pygame.time.get_ticks()
+
+        self.spawn_rate = 500
         self.point = 0
 
         self.targets = pygame.sprite.Group()
@@ -53,6 +56,7 @@ class Game:
         return pygame.Vector2(x, y)
     
     def quit(self):
+        print(self.point)
         pygame.quit()
         sys.exit()
     
@@ -62,6 +66,9 @@ class Game:
             if target.clicked:
                 target.kill()
                 self.point += 1
+        
+        if pygame.time.get_ticks() - self.start_time >= 10000:
+            self.quit()
 
     def render(self):
         self.targets.draw(self.window)
@@ -73,7 +80,6 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print(self.point)
                     self.quit()
                 if event.type == SPAWNTARGET:
                     self.spawn_target()
